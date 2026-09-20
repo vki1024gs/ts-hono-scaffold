@@ -1,0 +1,25 @@
+{
+  "name": "@proj/webui",
+  "version": "0.3.0",
+  "description": "Hono HTTP server",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --watch src/index.ts",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "hono": "^4.12.19",
+    "@hono/node-server": "^1.19.6",
+    "@proj/core": "workspace:*",
+    "@proj/api": "workspace:*",
+    "@proj/db": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "tsx": "^4.22.2",
+    "vitest": "^4.1.6",
+    "@types/node": "^22.0.0"
+  }
+}

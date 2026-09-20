@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "nameFrom": "package.json#name",
+    "versionFrom": "package.json#version"
+  },
+  "runtime": {
+    "foregroundScript": "app:run",
+    "managedScripts": {
+      "start": "app:start",
+      "stop": "app:stop",
+      "restart": "app:restart",
+      "status": "app:status",
+      "logs": "app:logs"
+    }
+  },
+  "health": {
+    "endpointId": "api",
+    "path": "/health/ready"
+  },
+  "open": {
+    "endpointId": "webui",
+    "path": "/"
+  },
+  "endpoints": [
+    {
+      "id": "webui",
+      "label": "WebUI",
+      "scheme": "http",
+      "hostEnv": "WEB_HOST",
+      "portEnv": "VITE_PORT"
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "scheme": "http",
+      "hostEnv": "HOST",
+      "portEnv": "PORT"
+    }
+  ]
+}

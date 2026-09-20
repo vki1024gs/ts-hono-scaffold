@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "applicationId": "fixture-app",
+  "documentType": "service-profiles",
+  "data": {
+    "theme": "dark",
+    "title": "Dashboard"
+  }
+}

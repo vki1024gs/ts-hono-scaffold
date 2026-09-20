@@ -1,0 +1,11 @@
+# Scaffold design
+
+The base is a contract-first local Hono/React application with a memory CRUD example. No UI library, caching layer, chat, login, SQLite or diagnostic CLI is preinstalled. Maintainer-owned recipes are independent source examples and are removed by initialization.
+
+The API package owns schemas and route definitions. The server uses a small response boundary that checks the exact declared schema; compile-time inference and real ts-rest-to-Hono tests enforce the pairing. No generic router/DI framework is introduced. Core is framework-free; repository instances are injected per application; the optional actor resolver is a narrow boundary, not a bundled authentication product.
+
+Health checks separate liveness, readiness and whole-app diagnosis. Logging separates structured event creation from supervisor-owned bounded file sinks. These use existing dependencies plus repository-owned Node primitives. No monitoring platform or logger framework is required. See README and docs/OPERATIONS.md for exact behavior and budgets.
+
+The root package version is the application release source of truth; version:set aligns workspace packages and core. Generated lineage is recorded independently in .scaffold/project.json. Historical template verification is never evidence for a generated project.
+
+Machine-local paths are resolved once from startup configuration through `APP_DATA_DIR`; lifecycle and logging code consume the resolved paths instead of inventing their own directories. Versioned, portable, user-editable data is a settings domain concern under `packages/core/src/settings`, not generic configuration. Every durable document has independent application, document-type and schema identities; migrations advance exactly one version and finish with application-owned decode/encode validation. The codec has no filesystem or Web dependencies. `packages/db` supplies memory and transactional file adapters with previewable import, exact-byte migration/import backups, validated atomic replacement, bounded retention and restoration. Transient process state remains in lifecycle scripts and may be rebuilt. The existing `createApp(options)` function remains the sole application composition factory.

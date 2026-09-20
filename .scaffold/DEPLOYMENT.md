@@ -1,0 +1,7 @@
+# Local runtime and deployment boundary
+
+Managed start/stop/status/smoke are for the current checkout on loopback. `app:run` is the foreground ownership boundary for Docker or an operating-system service manager; those environments inject `HOST`, `WEB_HOST`, ports and `APP_DATA_DIR`, own restart policy, and must not invoke the detached `app:start` path inside their managed process. Vite preview is still a local preview server, not a production hosting solution. A public deployment recipe must separately define static serving, proxy, authentication, trusted request identity, data durability, probes and restricted diagnostic exposure.
+
+Use pnpm app:start to build and prove API/WebUI/instance identity; pnpm smoke validates the running build. Logs, locks and state live under the `APP_DATA_DIR` root, which can be set in `.env`; omission uses the platform application-data directory. Never infer process ownership from a port or bare PID. Stop authenticates the recorded supervisor, then shuts down only children it created. Build/dependency cleanup does not remove local config, data or logs.
+
+Graceful shutdown revokes readiness, closes/drains connections and flushes bounded log buffers. Forced termination may lose buffered logs. Record actual platform checks rather than assuming Windows process behavior matches POSIX. See docs/OPERATIONS.md for budgets and failure actions.

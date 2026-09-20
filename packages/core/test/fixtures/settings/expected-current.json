@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "applicationId": "fixture-app",
+  "documentType": "user-settings",
+  "data": {
+    "theme": "dark",
+    "title": "Dashboard"
+  }
+}
