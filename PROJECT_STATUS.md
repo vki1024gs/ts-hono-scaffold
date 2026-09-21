@@ -36,7 +36,7 @@ Version 0.3.1 is committed and pushed to `vki1024gs/ts-hono-scaffold` on `main`.
 - [GitHub Actions run 35562317727](https://github.com/vki1024gs/ts-hono-scaffold/actions/runs/35562317727) passed the 0.3.1 source, production-artifact and freshly generated-project gates on Ubuntu, Windows and macOS. Earlier Windows findings exposed and fixed package-manager setup ordering, path-separator assumptions and graceful shutdown behavior. No actual Docker image run is claimed.
 - Memory storage is intentionally nonpersistent. Managed runtime now uses built output and the repository-owned Node static server; SQLite, production authentication and other P2 work require separate scope.
 - UI recipe intentionally adds a large Ant Design chunk; its cost is isolated from the default base.
-- Failed temporary verification copies and historical runtime logs are retained for inspection; they are not release artifacts. No unrelated workspace cleanup was performed.
+- Generated-project and recipe verification now report the failed stage and remove temporary copies by default. A maintainer may explicitly retain one diagnostic run with `SCAFFOLD_KEEP_FAILED_VERIFY=1`; successful runs always clean up. No unrelated workspace cleanup was performed.
 
 ## Knowledge closeout
 

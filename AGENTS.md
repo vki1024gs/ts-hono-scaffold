@@ -43,6 +43,7 @@ instructions, or template verification as current project instructions.
 - Keep development dependencies out of the built runtime. Production start must execute the bundled API and repository-owned static server without resolving `node_modules`, TypeScript, tsx, Vite, Vitest, ESLint or Prettier. Preserve `pnpm verify:production` when changing build or lifecycle code.
 - Safe build cleanup must preserve `.env` and user data. Destructive local reset is not a routine command.
 - Tests and fixtures must be deterministic, compact, offline after dependency installation, and clone-safe.
+- Generated-project and recipe verification must remove temporary copies on success and failure. Retention is an explicit one-run diagnostic opt-in through `SCAFFOLD_KEEP_FAILED_VERIFY=1`, never the default.
 
 - API service events use the shared structured logger; never log bodies, raw URLs, credentials or arbitrary error objects.
 - Health checks must be bounded and truthful; a 200 or live PID alone is not whole-app health. Preserve log budgets, instance ownership and failure visibility.

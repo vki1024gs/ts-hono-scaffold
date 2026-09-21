@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync } from 'node:fs';
+import { cpSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import net from 'node:net';
@@ -25,6 +25,35 @@ export function copyProject(root, label = 'generated') {
     stdio: 'ignore',
   });
   return { temporary, project };
+}
+export function finalizeVerificationCopy({
+  temporary,
+  project,
+  completed,
+  stage,
+  label = 'Generated verification',
+  environment = process.env,
+  report = console.error,
+}) {
+  const retain = !completed && environment.SCAFFOLD_KEEP_FAILED_VERIFY === '1';
+  if (retain) {
+    report(
+      `${label} failed during "${stage}". Inspection copy retained: ${project}`,
+    );
+    return { cleaned: false, retained: true };
+  }
+  try {
+    rmSync(temporary, { recursive: true, force: true });
+    if (!completed)
+      report(
+        `${label} failed during "${stage}". Temporary copy removed. ` +
+          'Set SCAFFOLD_KEEP_FAILED_VERIFY=1 to retain a future failure for inspection.',
+      );
+    return { cleaned: true, retained: false };
+  } catch {
+    report(`${label} could not clean its temporary copy: ${project}`);
+    return { cleaned: false, retained: false };
+  }
 }
 export async function freePorts() {
   const servers = [net.createServer(), net.createServer()];

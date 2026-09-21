@@ -5,13 +5,12 @@ import {
   appendFileSync,
   copyFileSync,
   mkdirSync,
-  rmSync,
   readdirSync,
 } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
-import { copyProject } from './lib/generated.mjs';
+import { copyProject, finalizeVerificationCopy } from './lib/generated.mjs';
 import { runPnpmSync } from './lib/pnpm.mjs';
 import { projectConfig } from './lib/config.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -23,7 +22,9 @@ for (const recipe of recipes) {
   if (!['ui', 'query', 'stream'].includes(recipe))
     throw new Error('Unknown recipe');
   const { project, temporary } = copyProject(root, 'recipe-' + recipe);
-  let passed = false;
+  let passed = false,
+    stage = 'initialize recipe project',
+    failure;
   const copy = (source, target) => {
     const destination = path.join(project, target);
     mkdirSync(path.dirname(destination), { recursive: true });
@@ -59,11 +60,13 @@ for (const recipe of recipes) {
       { cwd: project, stdio: 'inherit' },
     );
     appendFileSync(path.join(project, '.env'), '\nAPP_DATA_DIR=.runtime\n');
+    stage = 'install locked dependencies';
     runPnpmSync(['install', '--frozen-lockfile'], {
       cwd: project,
       stdio: 'inherit',
     });
     if (recipe === 'ui' || recipe === 'query') {
+      stage = `apply ${recipe} recipe`;
       // Keep base interaction coverage in the fixture while testing the replacement separately.
       copyFileSync(
         path.join(project, 'packages/frontend/src/pages/HomePage.tsx'),
@@ -91,6 +94,7 @@ for (const recipe of recipes) {
         'packages/frontend/test/' + recipe + '.test.tsx',
       );
     } else {
+      stage = 'apply stream recipe';
       copy('contract.ts', 'packages/api/src/chat.ts');
       edit(
         'packages/api/src/index.ts',
@@ -119,7 +123,9 @@ for (const recipe of recipes) {
       );
     }
     execFileSync('git', ['add', '.'], { cwd: project, stdio: 'ignore' });
+    stage = `verify ${recipe} recipe`;
     runPnpmSync(['verify'], { cwd: project, stdio: 'inherit' });
+    stage = `verify ${recipe} frozen reinstall`;
     runPnpmSync(['install', '--frozen-lockfile', '--offline'], {
       cwd: project,
       stdio: 'inherit',
@@ -145,8 +151,18 @@ for (const recipe of recipes) {
     );
     console.log('Recipe validated: ' + recipe + ' ' + JSON.stringify(sizes));
     passed = true;
+  } catch (error) {
+    failure = error;
   } finally {
-    if (passed) rmSync(temporary, { recursive: true, force: true });
-    else console.error('Recipe inspection copy retained: ' + project);
+    const cleanup = finalizeVerificationCopy({
+      temporary,
+      project,
+      completed: passed,
+      stage,
+      label: `Recipe verification (${recipe})`,
+    });
+    if (passed && !cleanup.cleaned)
+      failure = new Error('RECIPE_VERIFICATION_TEMP_CLEANUP_FAILED');
   }
+  if (failure) throw failure;
 }
