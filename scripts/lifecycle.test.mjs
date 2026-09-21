@@ -22,8 +22,14 @@ test('managed services launch through Node without shell command strings', () =>
     commands.map(({ command }) => command),
     [process.execPath, process.execPath],
   );
-  assert.ok(commands[0].args[0].endsWith('packages/webui/dist/index.mjs'));
-  assert.ok(commands[1].args[0].endsWith('scripts/serve-static.mjs'));
+  assert.equal(
+    path.relative(root, commands[0].args[0]),
+    path.join('packages', 'webui', 'dist', 'index.mjs'),
+  );
+  assert.equal(
+    path.relative(root, commands[1].args[0]),
+    path.join('scripts', 'serve-static.mjs'),
+  );
   assert.ok(
     commands.every(({ args }) => !args.join(' ').includes('node_modules')),
   );
