@@ -56,7 +56,7 @@ if (existsSync(path.join(project, 'node_modules')))
 
 const child = spawn(process.execPath, ['scripts/run-app.mjs'], {
   cwd: project,
-  stdio: ['ignore', 'pipe', 'pipe'],
+  stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
   windowsHide: true,
 });
 let stdout = '';
@@ -95,7 +95,7 @@ try {
     );
   if (!(await web.text()).includes('name="app-build"'))
     throw new Error('PRODUCTION_WEB_BUILD_IDENTITY_MISSING');
-  child.kill('SIGTERM');
+  child.send('shutdown');
   const code = await exited;
   if (code !== 0) throw new Error(`PRODUCTION_RUNTIME_STOP_FAILED_${code}`);
   console.log(
@@ -103,7 +103,8 @@ try {
   );
 } finally {
   if (child.exitCode === null) {
-    child.kill('SIGTERM');
+    if (child.connected) child.send('shutdown');
+    else child.kill('SIGTERM');
     await Promise.race([
       exited,
       new Promise((resolve) => setTimeout(resolve, 6000)),

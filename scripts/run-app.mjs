@@ -103,6 +103,9 @@ try {
   }
   process.once('SIGINT', () => void stop(0));
   process.once('SIGTERM', () => void stop(0));
+  process.on('message', (message) => {
+    if (message === 'shutdown') void stop(0);
+  });
   await ready();
   emit('service.ready', {
     effectiveEndpoints: [

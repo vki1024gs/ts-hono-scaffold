@@ -25,7 +25,7 @@ The current working tree prepares the 0.3.1 release on macOS. Completed PRDs hav
 ## Verification record
 
 - `pnpm verify`: passed with formatting, lint, typecheck, 34 Node script tests, 33 workspace tests, frontend build, bundled API build, dependency-free production projection and repository policy.
-- Clean generated project: frozen install, full verification, dependency-free production projection, managed start/smoke, actual proxy CRUD, deliberately mismatched build rejection, graceful stop, restart identity change, owned child-exit cleanup, foreground readiness and SIGTERM shutdown passed.
+- Clean generated project: frozen install, full verification, dependency-free production projection, managed start/smoke, actual proxy CRUD, deliberately mismatched build rejection, graceful stop, restart identity change, owned child-exit cleanup, foreground readiness and cross-platform graceful shutdown passed.
 - Independent UI, Query and stream recipe copies: installation, full verification and frozen reinstall passed. Default installation contains none of their optional dependencies.
 - Browser rehearsal: create/edit with keyboard, page 404 and 320 px viewport without horizontal overflow passed. Temporary browser tab and the owned rehearsal service were closed.
 - Default dependency installation was rebuilt with the frozen lockfile. Default production JS has no chunk above Vite's 500 kB warning threshold.

@@ -8,7 +8,7 @@ const config = projectConfig(root);
 const child = spawn(process.execPath, ['scripts/run-app.mjs'], {
   cwd: root,
   env: config.env,
-  stdio: ['ignore', 'pipe', 'inherit'],
+  stdio: ['ignore', 'pipe', 'inherit', 'ipc'],
   windowsHide: true,
 });
 let output = '';
@@ -34,11 +34,15 @@ try {
   await ready;
   const response = await fetch(config.apiOrigin + '/health/ready');
   if (!response.ok) throw new Error('FOREGROUND_NOT_READY');
-  child.kill('SIGTERM');
+  if (process.platform === 'win32') child.send('shutdown');
+  else child.kill('SIGTERM');
   const code = await new Promise((resolve) => child.once('exit', resolve));
   if (code !== 0) throw new Error(`FOREGROUND_STOP_FAILED_${code}`);
-  console.log('Foreground owner start, readiness and SIGTERM shutdown passed.');
+  console.log(
+    'Foreground owner start, readiness and graceful shutdown passed.',
+  );
 } catch (error) {
-  child.kill('SIGTERM');
+  if (process.platform === 'win32' && child.connected) child.send('shutdown');
+  else child.kill('SIGTERM');
   throw error;
 }
