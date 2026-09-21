@@ -24,9 +24,12 @@ try {
 }
 
 const required = [
+  '.gitattributes',
   '.env.example',
   '.github/workflows/ci.yml',
   '.node-version',
+  '.prettierignore',
+  '.prettierrc.json',
   'AGENTS.md',
   'PROJECT_STATUS.md',
   'README.md',
@@ -38,9 +41,11 @@ const required = [
   'scripts/doctor.mjs',
   'scripts/init.mjs',
   'scripts/smoke.mjs',
+  'scripts/serve-static.mjs',
   'scripts/verify-repository.mjs',
   'scripts/verify-generated.mjs',
   'scripts/verify-push.mjs',
+  'scripts/verify-production.mjs',
   'scripts/verify-version.mjs',
 ];
 const retiredDocuments = [
@@ -73,11 +78,41 @@ const missing = required.filter((file) => !existsSync(path.join(root, file)));
 const retiredPresent = retiredDocuments.filter((file) =>
   existsSync(path.join(root, file)),
 );
-const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
+const packageJson = JSON.parse(
+  readFileSync(path.join(root, 'package.json'), 'utf8'),
+);
 const serviceManifest = JSON.parse(
   readFileSync(path.join(root, 'service.manifest.json'), 'utf8'),
 );
 const manifestErrors = validateServiceManifest(serviceManifest, packageJson);
+for (const script of [
+  'format',
+  'format:check',
+  'lint',
+  'typecheck',
+  'test',
+  'build',
+])
+  if (!packageJson.scripts?.[script])
+    manifestErrors.push(`package.json: missing ${script} script`);
+for (const name of ['api', 'core', 'db', 'frontend', 'webui']) {
+  const file = `packages/${name}/package.json`;
+  const workspace = JSON.parse(readFileSync(path.join(root, file), 'utf8'));
+  if (workspace.private !== true)
+    manifestErrors.push(`${file}: internal workspace package must be private`);
+  if (String(workspace.main || '').startsWith('src/'))
+    manifestErrors.push(
+      `${file}: runtime main must not point at TypeScript source`,
+    );
+}
+const runtimeLauncher = readFileSync(
+  path.join(root, 'scripts/serve-app.mjs'),
+  'utf8',
+);
+if (/node_modules|vite\.js|tsx\/dist/.test(runtimeLauncher))
+  manifestErrors.push(
+    'scripts/serve-app.mjs: runtime must not resolve development dependencies',
+  );
 const forbiddenTracked = candidates.filter((file) => {
   if (file === '.env' || (file.startsWith('.env.') && file !== '.env.example'))
     return true;

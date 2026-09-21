@@ -76,5 +76,6 @@ test('container-style host and port injection reaches child commands', () => {
   assert.equal(config.apiOrigin, 'http://127.0.0.1:31080');
   const commands = serviceCommands(root, environment);
   assert.equal(commands[0].env.HOST, '0.0.0.0');
-  assert.ok(commands[1].args.includes('0.0.0.0'));
+  assert.equal(commands[1].env.WEB_HOST, '0.0.0.0');
+  assert.equal(commands[1].env.VITE_PORT, '31711');
 });

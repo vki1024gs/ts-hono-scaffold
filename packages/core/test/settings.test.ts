@@ -46,7 +46,10 @@ const codec = createSettingsCodec<Settings>({
 });
 
 const fixture = (name: string) =>
-  readFileSync(new URL(`fixtures/settings/${name}`, import.meta.url), 'utf8');
+  readFileSync(
+    new URL(`fixtures/settings/${name}`, import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
 
 describe('versioned portable user settings', () => {
   test('exports deterministically and imports without secrets', () => {
@@ -55,9 +58,7 @@ describe('versioned portable user settings', () => {
       theme: 'dark',
       token: 'private',
     });
-    expect(text).toBe(
-      fixture('expected-current.json'),
-    );
+    expect(text).toBe(fixture('expected-current.json'));
     expect(codec.importSettings(text)).toEqual({
       title: 'Dashboard',
       theme: 'dark',
@@ -83,7 +84,9 @@ describe('versioned portable user settings', () => {
     try {
       codec.importSettings(fixture('future.json'));
     } catch (error) {
-      expect((error as SettingsError).code).toBe('SETTINGS_VERSION_UNSUPPORTED');
+      expect((error as SettingsError).code).toBe(
+        'SETTINGS_VERSION_UNSUPPORTED',
+      );
     }
   });
 

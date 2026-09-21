@@ -34,17 +34,15 @@ afterEach(() => {
   window.history.replaceState(null, '', '/');
 });
 test('table recipe independently loads data and forwards search into URL and contract query', async () => {
-  const list = vi
-    .spyOn(api.items, 'list')
-    .mockResolvedValue({
-      items: [
-        { id: 'one', name: 'Alpha', createdAt: '2026-01-01T00:00:00.000Z' },
-      ],
-      total: 1,
-      page: 1,
-      limit: 10,
-      hasMore: false,
-    });
+  const list = vi.spyOn(api.items, 'list').mockResolvedValue({
+    items: [
+      { id: 'one', name: 'Alpha', createdAt: '2026-01-01T00:00:00.000Z' },
+    ],
+    total: 1,
+    page: 1,
+    limit: 10,
+    hasMore: false,
+  });
   render(<HomePage />);
   await screen.findByText('Alpha');
   fireEvent.change(screen.getByLabelText('Search items'), {

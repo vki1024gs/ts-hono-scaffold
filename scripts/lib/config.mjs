@@ -25,14 +25,25 @@ export function defaultAppDataDir(
 ) {
   const name = safeApplicationName(applicationName);
   if (platform === 'win32')
-    return path.join(environment.APPDATA || path.join(home, 'AppData', 'Roaming'), name);
+    return path.join(
+      environment.APPDATA || path.join(home, 'AppData', 'Roaming'),
+      name,
+    );
   if (platform === 'darwin')
     return path.join(home, 'Library', 'Application Support', name);
-  return path.join(environment.XDG_DATA_HOME || path.join(home, '.local', 'share'), name);
+  return path.join(
+    environment.XDG_DATA_HOME || path.join(home, '.local', 'share'),
+    name,
+  );
 }
-export function resolveAppDataDir(root, applicationName, environment = process.env) {
+export function resolveAppDataDir(
+  root,
+  applicationName,
+  environment = process.env,
+) {
   const configured = String(environment.APP_DATA_DIR || '').trim();
-  if (configured.includes('\0')) throw new Error('CONFIG_DATA_DIR: APP_DATA_DIR contains a null byte.');
+  if (configured.includes('\0'))
+    throw new Error('CONFIG_DATA_DIR: APP_DATA_DIR contains a null byte.');
   return path.resolve(
     configured
       ? path.isAbsolute(configured)
@@ -56,7 +67,9 @@ export function projectConfig(root, environment = process.env) {
       'CONFIG_PORT: PORT and VITE_PORT must be distinct integers from 1 to 65535.',
     );
   if (!isValidHost(apiHost) || !isValidHost(webHost))
-    throw new Error('CONFIG_HOST: HOST and WEB_HOST must be IP addresses or localhost.');
+    throw new Error(
+      'CONFIG_HOST: HOST and WEB_HOST must be IP addresses or localhost.',
+    );
   if (env.AUTH_MODE && !['none', 'dev'].includes(env.AUTH_MODE))
     throw new Error(
       'CONFIG_AUTH: No authentication adapter enabled; remove AUTH_MODE or use none/dev.',
@@ -84,14 +97,22 @@ export function projectConfig(root, environment = process.env) {
     backupDir: path.join(dataDir, 'backup'),
     logsDir: path.join(dataDir, 'logs'),
     stateFile: path.join(dataDir, 'app.json'),
-    buildInfoFile: path.join(dataDir, 'build-info.json'),
+    buildInfoFile: path.join(root, 'dist', 'build-info.json'),
     startLockFile: path.join(dataDir, 'start.lock'),
     legacyLogFile: path.join(dataDir, 'app.log'),
     apiPort,
     webPort,
     apiHost,
     webHost,
-    apiOrigin: 'http://' + (apiHost === '0.0.0.0' ? '127.0.0.1' : apiHost) + ':' + apiPort,
-    webOrigin: 'http://' + (webHost === '0.0.0.0' ? '127.0.0.1' : webHost) + ':' + webPort,
+    apiOrigin:
+      'http://' +
+      (apiHost === '0.0.0.0' ? '127.0.0.1' : apiHost) +
+      ':' +
+      apiPort,
+    webOrigin:
+      'http://' +
+      (webHost === '0.0.0.0' ? '127.0.0.1' : webHost) +
+      ':' +
+      webPort,
   };
 }

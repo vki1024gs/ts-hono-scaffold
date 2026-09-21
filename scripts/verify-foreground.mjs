@@ -13,7 +13,10 @@ const child = spawn(process.execPath, ['scripts/run-app.mjs'], {
 });
 let output = '';
 const ready = new Promise((resolve, reject) => {
-  const timer = setTimeout(() => reject(new Error('FOREGROUND_TIMEOUT')), 20000);
+  const timer = setTimeout(
+    () => reject(new Error('FOREGROUND_TIMEOUT')),
+    20000,
+  );
   child.stdout.on('data', (chunk) => {
     output += chunk;
     for (const line of output.split(/\r?\n/)) {

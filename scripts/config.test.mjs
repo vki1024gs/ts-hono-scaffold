@@ -15,26 +15,44 @@ test('application data defaults follow each operating system', () => {
     path.join('/home/test', 'Library', 'Application Support', 'sample'),
   );
   assert.equal(
-    defaultAppDataDir('@sample/workspace', { APPDATA: 'C:\\Data' }, 'win32', 'C:\\Users\\test'),
+    defaultAppDataDir(
+      '@sample/workspace',
+      { APPDATA: 'C:\\Data' },
+      'win32',
+      'C:\\Users\\test',
+    ),
     path.join('C:\\Data', 'sample'),
   );
   assert.equal(
-    defaultAppDataDir('@sample/workspace', { XDG_DATA_HOME: '/data' }, 'linux', '/home/test'),
+    defaultAppDataDir(
+      '@sample/workspace',
+      { XDG_DATA_HOME: '/data' },
+      'linux',
+      '/home/test',
+    ),
     path.join('/data', 'sample'),
   );
 });
 
 test('APP_DATA_DIR supports project-relative paths', () => {
   assert.equal(
-    resolveAppDataDir('/workspace/app', '@sample/workspace', { APP_DATA_DIR: '.local-data' }),
+    resolveAppDataDir('/workspace/app', '@sample/workspace', {
+      APP_DATA_DIR: '.local-data',
+    }),
     path.resolve('/workspace/app/.local-data'),
   );
 });
 
 test('process environment overrides .env for the application data directory', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'scaffold-config-'));
-  writeFileSync(path.join(root, 'package.json'), '{"name":"@sample/workspace"}\n');
-  writeFileSync(path.join(root, '.env'), 'APP_DATA_DIR=.from-env-file\nPORT=18080\nVITE_PORT=2711\n');
+  writeFileSync(
+    path.join(root, 'package.json'),
+    '{"name":"@sample/workspace"}\n',
+  );
+  writeFileSync(
+    path.join(root, '.env'),
+    'APP_DATA_DIR=.from-env-file\nPORT=18080\nVITE_PORT=2711\n',
+  );
   const config = projectConfig(root, {
     APP_DATA_DIR: '.from-process',
     PORT: '18081',
@@ -49,7 +67,10 @@ test('process environment overrides .env for the application data directory', ()
 
 test('listen hosts default to loopback and accept explicit container bindings', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'scaffold-hosts-'));
-  writeFileSync(path.join(root, 'package.json'), '{"name":"@sample/workspace"}\n');
+  writeFileSync(
+    path.join(root, 'package.json'),
+    '{"name":"@sample/workspace"}\n',
+  );
   const local = projectConfig(root, { PORT: '18080', VITE_PORT: '2711' });
   assert.equal(local.apiHost, '127.0.0.1');
   assert.equal(local.webHost, '127.0.0.1');

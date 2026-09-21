@@ -107,7 +107,10 @@ test('initialization commits a complete identity and refuses an accidental secon
     );
     assert.match(archivedRules, /^# Scaffold maintainer rules/);
     assert.match(archivedRules, /scaffold maintainer checkout only/);
-    assert.match(archivedRules, /must not override the initialized application/);
+    assert.match(
+      archivedRules,
+      /must not override the initialized application/,
+    );
     for (const file of [
       'PRD-scaffold-evolution.md',
       'PRD-managed-service-contract.md',
@@ -206,7 +209,11 @@ test('initialization, reconfiguration, and cleanup preserve external user data',
       cwd: target,
       encoding: 'utf8',
     });
-    assert.equal(initialized.status, 0, initialized.stdout + initialized.stderr);
+    assert.equal(
+      initialized.status,
+      0,
+      initialized.stdout + initialized.stderr,
+    );
     const reconfigured = spawnSync(
       process.execPath,
       [
@@ -232,11 +239,10 @@ test('initialization, reconfiguration, and cleanup preserve external user data',
       reconfigured.stdout + reconfigured.stderr,
     );
     for (const mode of ['build', 'deps']) {
-      const cleaned = spawnSync(
-        process.execPath,
-        ['scripts/clean.mjs', mode],
-        { cwd: target, encoding: 'utf8' },
-      );
+      const cleaned = spawnSync(process.execPath, ['scripts/clean.mjs', mode], {
+        cwd: target,
+        encoding: 'utf8',
+      });
       assert.equal(cleaned.status, 0, cleaned.stdout + cleaned.stderr);
     }
     assert.equal(readFileSync(sentinel, 'utf8'), content);

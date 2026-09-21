@@ -1,8 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { build } from 'esbuild';
 import { runPnpmSync } from './lib/pnpm.mjs';
 import { projectConfig } from './lib/config.mjs';
 import { ensureLogDirectory } from './lib/logging.mjs';
@@ -19,6 +20,18 @@ runPnpmSync(['--filter', scope + '/webui', 'build'], {
   cwd: root,
   stdio: 'inherit',
   env,
+});
+await build({
+  entryPoints: [path.join(root, 'packages/webui/src/index.ts')],
+  outfile: path.join(root, 'packages/webui/dist/index.mjs'),
+  bundle: true,
+  platform: 'node',
+  format: 'esm',
+  target: 'node24',
+  sourcemap: true,
+  packages: 'bundle',
+  define: { 'process.env.NODE_ENV': '"production"' },
+  logLevel: 'info',
 });
 const hash = createHash('sha256');
 function digest(dir) {
@@ -59,6 +72,7 @@ const marker = {
   builtAt: new Date().toISOString(),
   buildId: randomUUID(),
 };
+mkdirSync(path.dirname(buildInfoFile), { recursive: true });
 const html = path.join(root, 'packages/frontend/dist/index.html');
 writeFileSync(
   html,
@@ -67,8 +81,5 @@ writeFileSync(
     '<meta name="app-build" content="' + marker.buildId + '" /></head>',
   ),
 );
-writeFileSync(
-  buildInfoFile,
-  JSON.stringify(marker, null, 2) + '\n',
-);
+writeFileSync(buildInfoFile, JSON.stringify(marker, null, 2) + '\n');
 console.log('Build identity: ' + marker.version + ' @ ' + marker.revision);

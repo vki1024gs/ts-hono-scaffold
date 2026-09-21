@@ -179,10 +179,13 @@ export function createFileSettingsRepository<T>(options: {
     }
     const records: BackupRecord[] = [];
     for (const name of names.filter(
-      (entry) => entry.startsWith(backupPrefix) && entry.endsWith('.backup.json'),
+      (entry) =>
+        entry.startsWith(backupPrefix) && entry.endsWith('.backup.json'),
     )) {
       try {
-        records.push(parseBackup(await io.readFile(path.join(backupDir, name), 'utf8')));
+        records.push(
+          parseBackup(await io.readFile(path.join(backupDir, name), 'utf8')),
+        );
       } catch {
         // Invalid files are never considered restorable backups.
       }

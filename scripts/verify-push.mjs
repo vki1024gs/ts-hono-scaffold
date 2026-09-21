@@ -6,11 +6,10 @@ import { runPnpmSync } from './lib/pnpm.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const pending = () =>
-  execFileSync(
-    'git',
-    ['status', '--porcelain=v1', '--untracked-files=all'],
-    { cwd: root, encoding: 'utf8' },
-  ).trim();
+  execFileSync('git', ['status', '--porcelain=v1', '--untracked-files=all'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).trim();
 
 const requireClean = (stage) => {
   const output = pending();

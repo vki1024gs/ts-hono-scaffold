@@ -1,4 +1,4 @@
-# Independent integration recipes (0.3.0)
+# Independent integration recipes (0.3.1)
 
 These maintainer-owned files are excluded from initialized projects. Save the desired recipe outside a generated project before initialization, or obtain it from the scaffold version you adopted. There is one base application, no presets and no capability installer. Each recipe owns only its listed files. Use your generated package scope instead of `@proj`. Package installation requires network access; verify and commit the resulting lockfile.
 

@@ -1,10 +1,4 @@
-const exactKeys = (
-  value,
-  expected,
-  location,
-  errors,
-  required = expected,
-) => {
+const exactKeys = (value, expected, location, errors, required = expected) => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     errors.push(`${location}: expected an object`);
     return false;
@@ -25,24 +19,10 @@ export function validateServiceManifest(manifest, packageJson) {
   if (
     !exactKeys(
       manifest,
-      [
-        'schemaVersion',
-        'identity',
-        'runtime',
-        'health',
-        'open',
-        'endpoints',
-      ],
+      ['schemaVersion', 'identity', 'runtime', 'health', 'open', 'endpoints'],
       'manifest',
       errors,
-      [
-        'schemaVersion',
-        'identity',
-        'runtime',
-        'health',
-        'open',
-        'endpoints',
-      ],
+      ['schemaVersion', 'identity', 'runtime', 'health', 'open', 'endpoints'],
     )
   )
     return errors;

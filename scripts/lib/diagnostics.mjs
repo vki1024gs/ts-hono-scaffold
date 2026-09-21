@@ -98,9 +98,7 @@ export async function diagnose(
     });
   let marker;
   try {
-    marker = JSON.parse(
-      await readFile(config.buildInfoFile, 'utf8'),
-    );
+    marker = JSON.parse(await readFile(config.buildInfoFile, 'utf8'));
   } catch {
     add('build', 'fail', 'BUILD_MISSING', 'Run pnpm build and restart.');
   }

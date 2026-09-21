@@ -1,4 +1,8 @@
+// Initialization replaces the package scope before dependencies exist.
+// prettier-ignore
 import { contract, initClient, tsRestFetchApi, ErrorResponse } from '@proj/api';
+// Keep generated scopes formatting-stable.
+// prettier-ignore
 import type { ApiFetcherArgs, ClientInferRequest } from '@proj/api';
 export class ApiError extends Error {
   constructor(

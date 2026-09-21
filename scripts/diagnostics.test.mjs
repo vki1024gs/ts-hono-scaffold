@@ -60,13 +60,17 @@ test('environment overrides env file; invalid ports and mode fail explicitly', a
 test('HTTP 200 alone cannot pass whole-app diagnosis', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'scaffold-diagnose-'));
   try {
-    await writeFile(path.join(root, 'package.json'), '{"name":"@fixture/workspace"}');
+    await writeFile(
+      path.join(root, 'package.json'),
+      '{"name":"@fixture/workspace"}',
+    );
     await writeFile(path.join(root, '.env'), 'APP_DATA_DIR=.runtime\n');
     await mkdir(path.join(root, '.runtime'));
+    await mkdir(path.join(root, 'dist'));
     await writeFile(
-      path.join(root, '.runtime/build-info.json'),
+      path.join(root, 'dist/build-info.json'),
       JSON.stringify({
-        version: '0.3.0',
+        version: '0.3.1',
         revision: 'fixture',
         builtAt: new Date().toISOString(),
         buildId: 'fixture',

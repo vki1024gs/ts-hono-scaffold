@@ -1,7 +1,8 @@
 {
   "name": "@proj/webui",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Hono HTTP server",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "tsx --watch src/index.ts",
@@ -20,6 +21,6 @@
     "typescript": "^6.0.3",
     "tsx": "^4.22.2",
     "vitest": "^4.1.6",
-    "@types/node": "^22.0.0"
+    "@types/node": "^24.0.0"
   }
 }

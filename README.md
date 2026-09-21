@@ -1,8 +1,8 @@
 # TypeScript / Hono scaffold
 
-A contract-first local application scaffold: Hono, React/Vite and pnpm workspaces. The default application is a complete memory-backed CRUD example with a typed client, accessible controls, error recovery, health diagnostics and bounded structured logs. Application release version is **0.3.0**; the root package manifest is its source of truth.
+A contract-first local application scaffold: Hono, React/Vite and pnpm workspaces. The default application is a complete memory-backed CRUD example with a typed client, accessible controls, error recovery, health diagnostics and bounded structured logs. Application release version is **0.3.1**; the root package manifest is its source of truth.
 
-## 中文快速开始（0.3.0）
+## 中文快速开始（0.3.1）
 
 这是一个用于本地 WebUI/API 应用的 TypeScript 全栈脚手架。默认提供可运行的增删改查页面、类型化 API、健康诊断和结构化日志；数据保存在内存中，**重启后清空**。
 
@@ -68,7 +68,7 @@ pnpm dev
 - **清理日志**：先执行 `node scripts/app.mjs logs-clean --dry-run` 预览，再按需使用 `--apply`。不会删除正在写入的日志。
 - **需要数据库、登录或复杂 UI**：默认没有持久化或正式认证；按自己的业务接入。独立 UI、Query、stream 示例见 `.scaffold/recipes`，初始化时会移除这些维护者示例，接入前从对应脚手架版本获取。
 
-0.3.0 在既有契约、CRUD、健康和日志基础上，增加持久配置迁移/备份/回退、外部进程管理入口、严格服务清单、端点报告和安全冷启动规则。详细运维说明见 [OPERATIONS.md](docs/OPERATIONS.md)。
+0.3.1 在既有契约、CRUD、健康、日志和配置迁移基础上，补齐跨平台换行与格式门禁、真正的生产构建产物，以及不依赖 `node_modules` 或开发依赖的运行验证。详细运维说明见 [OPERATIONS.md](docs/OPERATIONS.md)。
 
 ## Create a project
 
@@ -103,7 +103,7 @@ pnpm app:restart
 pnpm doctor
 ```
 
-`dev` is a foreground development flow. Managed start builds first and records one checkout-owned instance. API and WebUI bind to loopback. An occupied port is an error; no command kills a port owner. Stop authenticates the recorded supervisor instance instead of trusting a PID alone. A stale launch lock or unresponsive recorded instance requires diagnosis; scripts never guess which foreign process to kill.
+`dev` is a foreground development flow. Managed start builds first and records one checkout-owned instance. The build bundles the API into `packages/webui/dist`, emits static WebUI files under `packages/frontend/dist`, and records immutable build identity under root `dist`. Runtime uses Node directly with a repository-owned static server and API proxy; it does not invoke `tsx`, `vite preview`, TypeScript, test tools or formatter packages. API and WebUI bind to loopback. An occupied port is an error; no command kills a port owner. Stop authenticates the recorded supervisor instance instead of trusting a PID alone. A stale launch lock or unresponsive recorded instance requires diagnosis; scripts never guess which foreign process to kill.
 
 A successful build does not prove that a running app is current. Start, status and smoke verify the instance, API contract, build identity, WebUI HTML marker and a referenced JavaScript resource. HTTP requests have a 2s limit including body reads; status/smoke have a 5s probe budget and startup readiness has a 15s budget after build. The build identity includes a source digest, so uncommitted changes are distinguishable. Smoke is not a browser interaction test.
 
@@ -132,18 +132,18 @@ Cleanup only removes closed owned archives. Build/dependency cleaning preserves 
 
 `.env.example` is the public startup contract. Precedence is process environment > `.env` > defaults; currently no runtime CLI configuration overrides are exposed. `PORT` and `VITE_PORT` must be distinct valid ports; `LOG_LEVEL` is debug/info/warn/error/fatal, default info; `VITE_APP_TITLE` supplies the frontend title. `APP_DATA_DIR` optionally selects one root for settings, backups, state, locks and logs. Relative values resolve from the project root; omission uses the platform application-data directory. No unused database path or session secret is advertised. Compatibility values AUTH_MODE=none/dev do not enable real login; other values fail startup.
 
-`HOST` and `WEB_HOST` default to `127.0.0.1`; an external container owner may explicitly inject `0.0.0.0`. After a build, `pnpm app:run` keeps one owner process in the foreground, reports versioned JSON lifecycle events on stdout, forwards SIGINT/SIGTERM, and never daemonizes or restarts itself. Local background management remains available through `app:start`, `app:stop`, and verified stop-then-start `app:restart`; all mutating actions share a cross-process operation lock and support `--json`. The versioned [service manifest](service.manifest.json) declares scripts, readiness, Open navigation and endpoint roles without machine paths or runtime port mappings. A Dashboard or container adapter remains the lifecycle owner for its deployment mode; do not nest `app:start` inside a container managed by that adapter.
+`HOST` and `WEB_HOST` default to `127.0.0.1`; an external container owner may explicitly inject `0.0.0.0`. After `pnpm build`, `pnpm app:run` keeps one owner process in the foreground, reports versioned JSON lifecycle events on stdout, forwards SIGINT/SIGTERM, and never daemonizes or restarts itself. The production verification copies only the built output and dependency-free runtime scripts into an empty directory, then proves health, static serving, API proxying and graceful shutdown without `node_modules`. Local background management remains available through `app:start`, `app:stop`, and verified stop-then-start `app:restart`; all mutating actions share a cross-process operation lock and support `--json`. The versioned [service manifest](service.manifest.json) declares scripts, readiness, Open navigation and endpoint roles without machine paths or runtime port mappings. A Dashboard or container adapter remains the lifecycle owner for its deployment mode; do not nest `app:start` inside a container managed by that adapter.
 
 ## Extend the application
 
-| Boundary | Responsibility |
-| --- | --- |
-| `packages/core` | Framework-free domain types, application version, and versioned user-settings contracts |
-| `packages/api` | Zod / ts-rest request, response, error and health contracts |
-| `packages/db` | Injected item/settings repositories with memory and atomic file settings adapters; no persistent business database |
-| `packages/webui` | Existing createApp composition factory, real HTTP routes, health engine, entrypoint |
-| `packages/frontend` | React pages and centralized ts-rest client |
-| `scripts` | Initialization, build, owned lifecycle, log files and verification |
+| Boundary            | Responsibility                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `packages/core`     | Framework-free domain types, application version, and versioned user-settings contracts                            |
+| `packages/api`      | Zod / ts-rest request, response, error and health contracts                                                        |
+| `packages/db`       | Injected item/settings repositories with memory and atomic file settings adapters; no persistent business database |
+| `packages/webui`    | Existing createApp composition factory, real HTTP routes, health engine, bundled server entrypoint                 |
+| `packages/frontend` | React pages and centralized ts-rest client                                                                         |
+| `scripts`           | Initialization, build, owned lifecycle, log files and verification                                                 |
 
 Change the API contract first, then server/client/tests together. Components use `src/api`, never raw fetch. The Hono app accepts repositories, optional identity resolver and health dependencies through the existing `createApp(options)` composition factory; all business routes share `/api/*`, so extensions require no proxy edits. Startup configuration remains in `.env` and `scripts/lib/config.mjs`. `packages/core/src/settings` owns deterministic versioned import/export for long-lived user settings without filesystem access; every durable document has an application identity, document type and schema version, and applications own payload validation and export redaction. `packages/db` performs previewable import, sequential migration, migration/import backup, validated atomic replacement and backup restoration. Migration failure is surfaced through the injected settings health check; it must never reset user data to defaults. Runtime state remains separate in the lifecycle layer. Optional authentication is an application boundary, not an implicit security feature of the memory CRUD demo.
 
@@ -152,8 +152,8 @@ Change the API contract first, then server/client/tests together. Components use
 ```sh
 pnpm verify
 pnpm verify:generated
-pnpm version:set 0.3.0
+pnpm version:set 0.3.1
 pnpm verify:push
 ```
 
-Verify includes real ESLint/React Hooks/import rules, types, offline deterministic tests, build and repository policy. Generated verification does a frozen install, verify, isolated-port managed start/smoke/stop and foreground shutdown. `verify:push` additionally requires a clean Git worktree before and after those checks, so it is run only after the intended release commit is created. CI runs the same functional gates on Windows, Linux and macOS; configured CI is not proof that remote runs passed. Local evidence belongs in PROJECT_STATUS.md. Never apply scaffold changes over an existing application's user data or business code automatically.
+Verify includes Prettier checking, real ESLint/React Hooks/import rules, types, offline deterministic tests, build, a dependency-free production-runtime projection and repository policy. Generated verification does a frozen install, verify, isolated-port managed start/smoke/stop and foreground shutdown. `verify:push` additionally requires a clean Git worktree before and after those checks, so it is run only after the intended release commit is created. CI runs the same functional gates on Windows, Linux and macOS; configured CI is not proof that remote runs passed. Local evidence belongs in PROJECT_STATUS.md. Never apply scaffold changes over an existing application's user data or business code automatically.

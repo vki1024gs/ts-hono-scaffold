@@ -14,6 +14,8 @@ import {
 import type { ServerInferResponses, HealthStatus } from '@proj/api';
 import { createMemoryItems } from '@proj/db';
 import type { ItemsRepository } from '@proj/db';
+// Initialization replaces the package scope before dependencies exist.
+// prettier-ignore
 import type { Actor, JsonObject, SettingsRepository } from '@proj/core';
 import { APP_VERSION } from '@proj/core';
 import { createLogger } from '../../../scripts/lib/logging.mjs';
@@ -29,9 +31,17 @@ export class AppError extends Error {
     super(message);
   }
 }
-export function parseRequest<T extends z.ZodTypeAny>(schema: T, value: unknown): z.output<T> {
+export function parseRequest<T extends z.ZodTypeAny>(
+  schema: T,
+  value: unknown,
+): z.output<T> {
   const parsed = schema.safeParse(value);
-  if (!parsed.success) throw new AppError(400, 'INVALID_REQUEST', 'Request does not match the API contract');
+  if (!parsed.success)
+    throw new AppError(
+      400,
+      'INVALID_REQUEST',
+      'Request does not match the API contract',
+    );
   return parsed.data;
 }
 export async function requestJson(c: Context<AppEnv>): Promise<unknown> {

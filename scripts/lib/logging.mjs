@@ -139,11 +139,22 @@ export function encodeEvent(record) {
 }
 let stdoutPending = 0;
 function boundedStdout(line) {
-  if (stdoutPending >= 1000 || process.stdout.writableLength + Buffer.byteLength(line) > 1024 * 1024)
-    throw Object.assign(new Error('Output queue full'), {code:'LOG_QUEUE_FULL'});
+  if (
+    stdoutPending >= 1000 ||
+    process.stdout.writableLength + Buffer.byteLength(line) > 1024 * 1024
+  )
+    throw Object.assign(new Error('Output queue full'), {
+      code: 'LOG_QUEUE_FULL',
+    });
   stdoutPending++;
-  try {return process.stdout.write(line, () => {stdoutPending--;});}
-  catch (error) {stdoutPending--;throw error;}
+  try {
+    return process.stdout.write(line, () => {
+      stdoutPending--;
+    });
+  } catch (error) {
+    stdoutPending--;
+    throw error;
+  }
 }
 export function createLogger(
   identity,
@@ -154,16 +165,25 @@ export function createLogger(
   } = {},
 ) {
   if (!levels.includes(level)) throw new Error('CONFIG_LOG_LEVEL');
-  let failed = false, droppedCount = 0,
+  let failed = false,
+    droppedCount = 0,
     lastFallback = -Infinity;
   const log = (severity, event, fields) => {
     if (levels.indexOf(severity) < levels.indexOf(level)) return;
     try {
       write(encodeEvent(eventRecord(identity, severity, event, fields)));
-      if (failed) write(encodeEvent(eventRecord(identity, 'warn', 'logging.recovered', {droppedCount})));
+      if (failed)
+        write(
+          encodeEvent(
+            eventRecord(identity, 'warn', 'logging.recovered', {
+              droppedCount,
+            }),
+          ),
+        );
       failed = false;
     } catch {
-      droppedCount++;failed = true;
+      droppedCount++;
+      failed = true;
       if (Date.now() - lastFallback >= 60000) {
         lastFallback = Date.now();
         try {
@@ -180,8 +200,12 @@ export async function ensureDataDirectory(dataDir, create = true) {
   const directory = path.resolve(dataDir);
   if (create) await fs.mkdir(directory, { recursive: true, mode: 0o700 });
   let info;
-  try { info = await fs.lstat(directory); }
-  catch (error) { if (!create && error.code === 'ENOENT') return null; throw error; }
+  try {
+    info = await fs.lstat(directory);
+  } catch (error) {
+    if (!create && error.code === 'ENOENT') return null;
+    throw error;
+  }
   if (!info.isDirectory() || info.isSymbolicLink())
     throw Object.assign(new Error('Unsafe application data path'), {
       code: 'LOG_UNSAFE_PATH',
@@ -193,14 +217,23 @@ export async function ensureLogDirectory(dataDir, create = true) {
   if (!root) return null;
   const directory = path.join(root, 'logs');
   if (create) {
-    try { await fs.mkdir(directory, { mode: 0o700 }); }
-    catch (error) { if (error.code !== 'EEXIST') throw error; }
+    try {
+      await fs.mkdir(directory, { mode: 0o700 });
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+    }
   }
   let info;
-  try { info = await fs.lstat(directory); }
-  catch (error) { if (!create && error.code === 'ENOENT') return null; throw error; }
+  try {
+    info = await fs.lstat(directory);
+  } catch (error) {
+    if (!create && error.code === 'ENOENT') return null;
+    throw error;
+  }
   if (!info.isDirectory() || info.isSymbolicLink())
-    throw Object.assign(new Error('Unsafe log path'), { code: 'LOG_UNSAFE_PATH' });
+    throw Object.assign(new Error('Unsafe log path'), {
+      code: 'LOG_UNSAFE_PATH',
+    });
   return directory;
 }
 const ownedName =

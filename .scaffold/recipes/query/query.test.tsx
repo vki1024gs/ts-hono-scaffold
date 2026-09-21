@@ -14,15 +14,13 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 test('query recipe loads and invalidates after a write without a UI library', async () => {
-  const list = vi
-    .spyOn(api.items, 'list')
-    .mockResolvedValue({
-      items: [],
-      total: 0,
-      page: 1,
-      limit: 20,
-      hasMore: false,
-    });
+  const list = vi.spyOn(api.items, 'list').mockResolvedValue({
+    items: [],
+    total: 0,
+    page: 1,
+    limit: 20,
+    hasMore: false,
+  });
   vi.spyOn(api.items, 'create').mockResolvedValue({
     id: 'one',
     name: 'Alpha',

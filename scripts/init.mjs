@@ -10,7 +10,10 @@ import { stdin as input, stdout as output } from 'node:process';
 const root = process.cwd();
 const markerFile = path.join(root, '.scaffold', 'project.json');
 const allowedRootFiles = [
+  '.gitattributes',
   '.env.example',
+  '.prettierignore',
+  '.prettierrc.json',
   'AGENTS.md',
   'Makefile',
   'eslint.config.mjs',
@@ -101,12 +104,13 @@ This is the initialized ${name} application, derived from the TypeScript/Hono sc
 - Frontend components do not call \`fetch\` directly.
 - Never kill a process because it owns a configured port. Managed lifecycle commands may stop only the recorded project-owned process tree.
 - Use one lifecycle owner. Do not run \`app:start\` inside Docker or another service manager that already owns \`app:run\`.
+- Keep development dependencies out of runtime. \`pnpm build\` must emit the bundled API, static WebUI and build identity; \`app:run\` must not resolve TypeScript, tsx, Vite, Vitest, ESLint or Prettier.
 - Keep startup configuration in environment variables. Durable user documents require stable identity, schema versions, sequential migrations, validation, backup and rollback; upgrades must not overwrite \`APP_DATA_DIR\`.
 - Never commit \`.env\`, credentials, dependencies, build output, logs, databases or machine-local application data.
 
 ## Required checks
 
-Run \`pnpm verify\` before handoff. For lifecycle or deployment changes, also run \`pnpm verify:generated\`. Record only verification actually performed for this application; scaffold maintainer results are not application evidence.
+Run \`pnpm verify\` before handoff. For lifecycle or deployment changes, also run \`pnpm verify:production\` and \`pnpm verify:generated\`. Record only verification actually performed for this application; scaffold maintainer results are not application evidence.
 `;
 
 async function collectFiles(directory) {

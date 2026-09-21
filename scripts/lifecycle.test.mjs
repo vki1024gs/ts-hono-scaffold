@@ -22,8 +22,11 @@ test('managed services launch through Node without shell command strings', () =>
     commands.map(({ command }) => command),
     [process.execPath, process.execPath],
   );
-  assert.equal(commands[0].args[0], '--import');
-  assert.ok(commands[1].args[0].endsWith('vite.js'));
+  assert.ok(commands[0].args[0].endsWith('packages/webui/dist/index.mjs'));
+  assert.ok(commands[1].args[0].endsWith('scripts/serve-static.mjs'));
+  assert.ok(
+    commands.every(({ args }) => !args.join(' ').includes('node_modules')),
+  );
 });
 
 test('safe build cleaning preserves local configuration and data', () => {

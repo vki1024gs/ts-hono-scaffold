@@ -40,6 +40,7 @@ instructions, or template verification as current project instructions.
 - Frontend components do not call `fetch` directly; add calls in `packages/frontend/src/api/index.ts`.
 - Managed start/stop/restart must affect only the current checkout's recorded process tree. Never kill a process because it happens to own a configured port.
 - Preserve one lifecycle owner: `app:run` stays foreground for Docker/system service ownership, while `app:start/stop/restart` own the local detached instance. Never nest the local supervisor inside another runtime owner. Keep `service.manifest.json`, package scripts, environment keys, health paths and endpoint roles synchronized through repository tests.
+- Keep development dependencies out of the built runtime. Production start must execute the bundled API and repository-owned static server without resolving `node_modules`, TypeScript, tsx, Vite, Vitest, ESLint or Prettier. Preserve `pnpm verify:production` when changing build or lifecycle code.
 - Safe build cleanup must preserve `.env` and user data. Destructive local reset is not a routine command.
 - Tests and fixtures must be deterministic, compact, offline after dependency installation, and clone-safe.
 
@@ -54,10 +55,12 @@ instructions, or template verification as current project instructions.
 ## Required checks
 
 ```bash
+pnpm format:check
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm verify:production
 pnpm verify:repository
 ```
 

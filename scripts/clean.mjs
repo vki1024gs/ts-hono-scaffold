@@ -1,16 +1,14 @@
 import { rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { projectConfig } from './lib/config.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const config = projectConfig(root);
 const mode = process.argv[2];
 const remove = (relative) =>
   rmSync(path.join(root, relative), { recursive: true, force: true });
 
 if (mode === 'build') {
-  rmSync(config.buildInfoFile, { force: true });
+  remove('dist');
   remove('coverage');
   for (const name of ['api', 'cli', 'core', 'db', 'frontend', 'webui'])
     remove(`packages/${name}/dist`);

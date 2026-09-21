@@ -25,7 +25,7 @@ import {
 const identity = {
   service: 'api',
   instanceId: 'fixture',
-  version: '0.3.0',
+  version: '0.3.1',
   revision: 'fixture',
 };
 async function fixture(fn) {
@@ -302,8 +302,9 @@ test('rotation EBUSY retries are bounded and recovery retains the old complete f
       for (const line of (await readFile(file.file, 'utf8')).trim().split('\n'))
         if (line) JSON.parse(line);
   }));
-test('reading and dry-run on a never-started checkout create no runtime directories',()=>fixture(async root=>{
- assert.equal((await cleanLogs(root,true)).count,0);
- assert.equal((await readLogs(root)).events.length,0);
- assert.deepEqual(await readdir(root),[]);
-}));
+test('reading and dry-run on a never-started checkout create no runtime directories', () =>
+  fixture(async (root) => {
+    assert.equal((await cleanLogs(root, true)).count, 0);
+    assert.equal((await readLogs(root)).events.length, 0);
+    assert.deepEqual(await readdir(root), []);
+  }));

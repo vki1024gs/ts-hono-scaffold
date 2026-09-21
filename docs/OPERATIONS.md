@@ -1,26 +1,26 @@
-# Health and log operations (0.3.0)
+# Health and log operations (0.3.1)
 
-These are local application diagnostics, not production hosting or audit guarantees. Vite preview remains a local preview server. The first-party event schema is version 1. UTC timestamps support cross-process ordering; durations use a monotonic clock. Ordering between concurrent events is not a transaction guarantee.
+These are local application diagnostics, not production hosting or audit guarantees. Built WebUI files are served by the repository-owned Node static server, which also proxies API and health paths; development still uses Vite. The first-party event schema is version 1. UTC timestamps support cross-process ordering; durations use a monotonic clock. Ordering between concurrent events is not a transaction guarantee.
 
 ## Reasons and actions
 
-| Code/state | Meaning | Action |
-| --- | --- | --- |
-| starting | Initialization has not completed | Wait within startup budget; inspect startup events |
-| stopping | Readiness revoked | Allow bounded drain; inspect forced-stop events if needed |
-| CHECK_TIMEOUT | Dependency exceeded 500ms or still has a previous hung call | Inspect dependency; do not repeatedly create hung tasks |
-| CHECK_FAILED | Required dependency failed or optional dependency warned | Inspect registered check and safe application error events |
-| API_UNAVAILABLE_OR_INVALID | API could not be read/validated within deadline | Inspect API logs and recorded address |
-| BUILD_OR_INSTANCE_MISMATCH | API differs from expected build/managed instance | Build and restart the managed instance |
-| WEBUI_BUILD_OR_ASSET_INVALID | Wrong HTML, missing resource or old WebUI build | Build and restart WebUI; inspect its tool events |
-| INSTANCE_UNAVAILABLE | Supervisor cannot prove recorded identity | Inspect stale state; never kill the configured port owner |
-| LOG_STATUS_STALE | Log snapshot unavailable or too old | Inspect supervisor and filesystem |
-| ENOSPC / LOG_CAPACITY | Disk full or repository log budget exhausted | Free space or dry-run/apply archive cleanup; inspect legacy log size |
-| EACCES / EPERM | Directory/file permissions deny writing | Restore user access to the configured application data directory |
-| EBUSY | File rotation blocked | Release third-party file handle; writer retries then reports failure |
-| LOG_QUEUE_FULL / EIO | Queue overload or slow/failed sink | Reduce output rate, inspect disk latency; droppedCount is observable |
-| LOG_UNSAFE_PATH | Symlink/non-regular path would escape file ownership | Restore a normal directory; do not follow/remove external targets |
-| SHUTDOWN_TIMEOUT | Drain exceeded budget | Inspect child status; buffered tail may be lost |
+| Code/state                   | Meaning                                                     | Action                                                               |
+| ---------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
+| starting                     | Initialization has not completed                            | Wait within startup budget; inspect startup events                   |
+| stopping                     | Readiness revoked                                           | Allow bounded drain; inspect forced-stop events if needed            |
+| CHECK_TIMEOUT                | Dependency exceeded 500ms or still has a previous hung call | Inspect dependency; do not repeatedly create hung tasks              |
+| CHECK_FAILED                 | Required dependency failed or optional dependency warned    | Inspect registered check and safe application error events           |
+| API_UNAVAILABLE_OR_INVALID   | API could not be read/validated within deadline             | Inspect API logs and recorded address                                |
+| BUILD_OR_INSTANCE_MISMATCH   | API differs from expected build/managed instance            | Build and restart the managed instance                               |
+| WEBUI_BUILD_OR_ASSET_INVALID | Wrong HTML, missing resource or old WebUI build             | Build and restart WebUI; inspect its tool events                     |
+| INSTANCE_UNAVAILABLE         | Supervisor cannot prove recorded identity                   | Inspect stale state; never kill the configured port owner            |
+| LOG_STATUS_STALE             | Log snapshot unavailable or too old                         | Inspect supervisor and filesystem                                    |
+| ENOSPC / LOG_CAPACITY        | Disk full or repository log budget exhausted                | Free space or dry-run/apply archive cleanup; inspect legacy log size |
+| EACCES / EPERM               | Directory/file permissions deny writing                     | Restore user access to the configured application data directory     |
+| EBUSY                        | File rotation blocked                                       | Release third-party file handle; writer retries then reports failure |
+| LOG_QUEUE_FULL / EIO         | Queue overload or slow/failed sink                          | Reduce output rate, inspect disk latency; droppedCount is observable |
+| LOG_UNSAFE_PATH              | Symlink/non-regular path would escape file ownership        | Restore a normal directory; do not follow/remove external targets    |
+| SHUTDOWN_TIMEOUT             | Drain exceeded budget                                       | Inspect child status; buffered tail may be lost                      |
 
 Individual readiness checks time out at 500ms and share a cached/in-flight round for at most 1s. A timed-out uncancellable dependency keeps its slot until it settles; later rounds report timeout instead of creating more work. Startup and stopping override cached healthy checks. Status includes checkedAt, durationMs and ageMs; it does not mutate business data or run migrations. Machine-local state uses the single `APP_DATA_DIR` root; relative values resolve from the project root and omission uses the platform application-data directory.
 
@@ -33,19 +33,51 @@ Ordinary HTTP completions are info; permission failures, slow requests and degra
 Minimal ready responses:
 
 ```json
-{"schemaVersion":1,"status":"healthy","timestamp":"2026-09-08T00:00:00.000Z","requestId":"example-id"}
+{
+  "schemaVersion": 1,
+  "status": "healthy",
+  "timestamp": "2026-09-08T00:00:00.000Z",
+  "requestId": "example-id"
+}
 ```
 
 An optional logging check warning produces degraded/200; a required repository failure produces unhealthy/503. Detailed `/status` additionally supplies identity, memory storage and checks such as:
 
 ```json
-{"name":"repository","required":true,"status":"fail","code":"CHECK_TIMEOUT","message":"Check exceeded deadline","checkedAt":"2026-09-08T00:00:00.000Z","durationMs":500,"ageMs":0}
+{
+  "name": "repository",
+  "required": true,
+  "status": "fail",
+  "code": "CHECK_TIMEOUT",
+  "message": "Check exceeded deadline",
+  "checkedAt": "2026-09-08T00:00:00.000Z",
+  "durationMs": 500,
+  "ageMs": 0
+}
 ```
 
 One complete NDJSON event:
 
 ```json
-{"schemaVersion":1,"timestamp":"2026-09-20T00:00:00.000Z","level":"info","service":"api","component":"api","event":"http.completed","message":"HTTP request completed","pid":123,"instanceId":"example-instance","version":"0.3.0","revision":"example-source","requestId":"example-id","method":"GET","route":"/api/items","statusCode":200,"durationMs":2,"outcome":"completed"}
+{
+  "schemaVersion": 1,
+  "timestamp": "2026-09-20T00:00:00.000Z",
+  "level": "info",
+  "service": "api",
+  "component": "api",
+  "event": "http.completed",
+  "message": "HTTP request completed",
+  "pid": 123,
+  "instanceId": "example-instance",
+  "version": "0.3.1",
+  "revision": "example-source",
+  "requestId": "example-id",
+  "method": "GET",
+  "route": "/api/items",
+  "statusCode": 200,
+  "durationMs": 2,
+  "outcome": "completed"
+}
 ```
 
 ## File behavior and limits

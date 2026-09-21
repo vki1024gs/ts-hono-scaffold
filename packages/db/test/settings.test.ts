@@ -50,7 +50,9 @@ describe('settings repositories', () => {
   });
 
   test('file repository writes atomically and reads through the codec', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'settings-repository-'));
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'settings-repository-'),
+    );
     const file = path.join(root, 'settings', 'settings.json');
     const repository = createFileSettingsRepository({ file, codec });
     expect(await repository.load()).toBeNull();
@@ -175,9 +177,15 @@ describe('settings repositories', () => {
       unlink: (target: string) => fs.unlink(target),
       readdir: (target: string) => fs.readdir(target),
     };
-    const repository = createFileSettingsRepository({ file, codec, fileSystem });
+    const repository = createFileSettingsRepository({
+      file,
+      codec,
+      fileSystem,
+    });
 
-    await expect(repository.save({ title: 'Replacement' })).rejects.toMatchObject({
+    await expect(
+      repository.save({ title: 'Replacement' }),
+    ).rejects.toMatchObject({
       code: 'SETTINGS_WRITE_FAILED',
     } satisfies Partial<SettingsStorageError>);
     expect(await fs.readFile(file, 'utf8')).toBe(before);
@@ -202,7 +210,9 @@ describe('settings repositories', () => {
   });
 
   test('backup retention is bounded without blocking successful imports', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'settings-retention-'));
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'settings-retention-'),
+    );
     const file = path.join(root, 'settings.json');
     const ids = [1, 2, 3].map(
       (value) => `00000000-0000-4000-8000-${String(value).padStart(12, '0')}`,

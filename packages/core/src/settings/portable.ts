@@ -1,8 +1,4 @@
-import type {
-  JsonObject,
-  JsonValue,
-  SettingsDocument,
-} from './model';
+import type { JsonObject, JsonValue, SettingsDocument } from './model';
 
 export type SettingsMigration = (
   document: SettingsDocument,
@@ -57,11 +53,7 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
 function normalizeJson(value: unknown, path = '$'): JsonValue {
-  if (
-    value === null ||
-    typeof value === 'string' ||
-    typeof value === 'boolean'
-  )
+  if (value === null || typeof value === 'string' || typeof value === 'boolean')
     return value;
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (Array.isArray(value))
@@ -90,11 +82,17 @@ function parseDocument(input: string | unknown): SettingsDocument {
     try {
       value = JSON.parse(input);
     } catch {
-      throw new SettingsError('SETTINGS_JSON_INVALID', 'Settings are not valid JSON');
+      throw new SettingsError(
+        'SETTINGS_JSON_INVALID',
+        'Settings are not valid JSON',
+      );
     }
   }
   if (!isObject(value))
-    throw new SettingsError('SETTINGS_DOCUMENT_INVALID', 'Settings document must be an object');
+    throw new SettingsError(
+      'SETTINGS_DOCUMENT_INVALID',
+      'Settings document must be an object',
+    );
   if (
     !Number.isInteger(value.schemaVersion) ||
     Number(value.schemaVersion) < 1 ||
@@ -103,7 +101,10 @@ function parseDocument(input: string | unknown): SettingsDocument {
     !value.documentType ||
     !isObject(value.data)
   )
-    throw new SettingsError('SETTINGS_DOCUMENT_INVALID', 'Settings envelope is invalid');
+    throw new SettingsError(
+      'SETTINGS_DOCUMENT_INVALID',
+      'Settings envelope is invalid',
+    );
   return normalizeJson(value) as SettingsDocument;
 }
 
@@ -166,7 +167,10 @@ export function createSettingsCodec<T>(
       data = normalized as JsonObject;
     } catch (error) {
       if (error instanceof SettingsError) throw error;
-      throw new SettingsError('SETTINGS_DATA_INVALID', 'Settings cannot be exported');
+      throw new SettingsError(
+        'SETTINGS_DATA_INVALID',
+        'Settings cannot be exported',
+      );
     }
     return {
       schemaVersion: options.currentVersion,
@@ -184,7 +188,10 @@ export function createSettingsCodec<T>(
       value = options.decode(document.data);
     } catch (error) {
       if (error instanceof SettingsError) throw error;
-      throw new SettingsError('SETTINGS_DATA_INVALID', 'Settings data are invalid');
+      throw new SettingsError(
+        'SETTINGS_DATA_INVALID',
+        'Settings data are invalid',
+      );
     }
     const canonical = exportSettings(value);
     return {

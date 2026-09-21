@@ -245,9 +245,14 @@ test('cached health is bounded and status-change logs report recovery once', asy
 test('internal syntax and schema errors remain server failures', async () => {
   for (const error of [new SyntaxError('private-detail'), new z.ZodError([])]) {
     const repository = createMemoryItems();
-    repository.create = async () => { throw error; };
+    repository.create = async () => {
+      throw error;
+    };
     const { app } = createApp({ logger, repository });
-    const response = await app.request('/api/items', { method: 'POST', body: '{"name":"x"}' });
+    const response = await app.request('/api/items', {
+      method: 'POST',
+      body: '{"name":"x"}',
+    });
     expect(response.status).toBe(500);
     const body = await response.json();
     expect(body.error).toBe('INTERNAL_ERROR');

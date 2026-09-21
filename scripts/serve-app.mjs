@@ -2,58 +2,33 @@ import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { readFile, writeFile, rename, unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { projectConfig } from './lib/config.mjs';
 import { LogSink, eventRecord, levels } from './lib/logging.mjs';
 const scriptPath = fileURLToPath(import.meta.url),
   root = path.resolve(path.dirname(scriptPath), '..');
 export function serviceCommands(workspaceRoot, environment = process.env) {
-  const { apiPort, webPort, webHost, env } = projectConfig(
-    workspaceRoot,
-    environment,
-  );
+  const { apiPort, env } = projectConfig(workspaceRoot, environment);
   return [
     {
       service: 'api',
       command: process.execPath,
-      args: [
-        '--import',
-        pathToFileURL(
-          path.join(
-            workspaceRoot,
-            'packages/webui/node_modules/tsx/dist/loader.mjs',
-          ),
-        ).href,
-        'src/index.ts',
-      ],
+      args: [path.join(workspaceRoot, 'packages/webui/dist/index.mjs')],
       cwd: path.join(workspaceRoot, 'packages/webui'),
       env: { ...env, PORT: String(apiPort) },
     },
     {
       service: 'webui',
       command: process.execPath,
-      args: [
-        path.join(
-          workspaceRoot,
-          'packages/frontend/node_modules/vite/bin/vite.js',
-        ),
-        'preview',
-        '--host',
-        webHost,
-        '--port',
-        String(webPort),
-        '--strictPort',
-      ],
-      cwd: path.join(workspaceRoot, 'packages/frontend'),
+      args: [path.join(workspaceRoot, 'scripts/serve-static.mjs')],
+      cwd: workspaceRoot,
       env,
     },
   ];
 }
 async function serve() {
   const config = projectConfig(root),
-    marker = JSON.parse(
-      await readFile(config.buildInfoFile, 'utf8'),
-    );
+    marker = JSON.parse(await readFile(config.buildInfoFile, 'utf8'));
   const instanceId = process.env.APP_INSTANCE_ID,
     token = process.env.APP_CONTROL_TOKEN;
   if (!instanceId || !token)
@@ -102,11 +77,8 @@ async function serve() {
     server.close();
     server.closeAllConnections();
     try {
-      const saved = JSON.parse(
-        await readFile(config.stateFile, 'utf8'),
-      );
-      if (saved.instanceId === instanceId)
-        await unlink(config.stateFile);
+      const saved = JSON.parse(await readFile(config.stateFile, 'utf8'));
+      if (saved.instanceId === instanceId) await unlink(config.stateFile);
     } catch {}
     process.exit(code);
   }
@@ -157,10 +129,7 @@ async function serve() {
     JSON.stringify(state, null, 2) + '\n',
     { mode: 0o600 },
   );
-  await rename(
-    config.stateFile + '.tmp',
-    config.stateFile,
-  );
+  await rename(config.stateFile + '.tmp', config.stateFile);
   emit('info', 'app.starting');
   for (const definition of serviceCommands(root)) {
     const child = spawn(definition.command, definition.args, {

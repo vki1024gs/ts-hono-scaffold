@@ -131,9 +131,18 @@ for (const recipe of recipes) {
         const bytes = readFileSync(path.join(assets, f));
         return { file: f, bytes: bytes.length, gzip: gzipSync(bytes).length };
       });
-    results.push({recipe,verifiedAt:new Date().toISOString(),sizes,installedEntries:readdirSync(path.join(project,'node_modules/.pnpm')).length});
-    mkdirSync(config.dataDir,{recursive:true});
-    writeFileSync(path.join(config.dataDir,'recipe-validation.json'),JSON.stringify(results,null,2));
+    results.push({
+      recipe,
+      verifiedAt: new Date().toISOString(),
+      sizes,
+      installedEntries: readdirSync(path.join(project, 'node_modules/.pnpm'))
+        .length,
+    });
+    mkdirSync(config.dataDir, { recursive: true });
+    writeFileSync(
+      path.join(config.dataDir, 'recipe-validation.json'),
+      JSON.stringify(results, null, 2),
+    );
     console.log('Recipe validated: ' + recipe + ' ' + JSON.stringify(sizes));
     passed = true;
   } finally {

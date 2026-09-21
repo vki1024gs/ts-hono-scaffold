@@ -156,7 +156,8 @@ async function start() {
         });
         if (result.exitCode === 0) {
           await control(state, 'ready', deadline);
-          if (!json) console.log('Application started. WebUI: ' + config.webOrigin);
+          if (!json)
+            console.log('Application started. WebUI: ' + config.webOrigin);
           return state;
         }
       }

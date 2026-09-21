@@ -1,5 +1,11 @@
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import {
+  appendFileSync,
+  existsSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runPnpmSync } from './lib/pnpm.mjs';
