@@ -4,7 +4,7 @@ Updated: 2026-09-21. Scaffold version: **0.3.1** (root package.json is authorita
 
 ## Delivery state
 
-The current working tree prepares the 0.3.1 release on macOS. Completed PRDs have been retired; this file records current evidence without implying a commit, push, tag, hosted release, remote CI pass, merge or deployment.
+Version 0.3.1 is committed and pushed to `vki1024gs/ts-hono-scaffold` on `main`. Completed PRDs have been retired; this file records verified repository and CI evidence without implying a tag, hosted release or deployment.
 
 | Requirement        | Implemented behavior / evidence                                                                                                                                        |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -33,7 +33,7 @@ The current working tree prepares the 0.3.1 release on macOS. Completed PRDs hav
 
 ## Remaining external checks and limits
 
-- Ubuntu, Windows and macOS CI matrix is configured; 0.3.1 remote runner results are pending. The earlier Windows failure was CRLF-sensitive fixture comparison; `.gitattributes` and normalized fixture reads now cover it locally. No actual Docker image run is claimed.
+- [GitHub Actions run 35562317727](https://github.com/vki1024gs/ts-hono-scaffold/actions/runs/35562317727) passed the 0.3.1 source, production-artifact and freshly generated-project gates on Ubuntu, Windows and macOS. Earlier Windows findings exposed and fixed package-manager setup ordering, path-separator assumptions and graceful shutdown behavior. No actual Docker image run is claimed.
 - Memory storage is intentionally nonpersistent. Managed runtime now uses built output and the repository-owned Node static server; SQLite, production authentication and other P2 work require separate scope.
 - UI recipe intentionally adds a large Ant Design chunk; its cost is isolated from the default base.
 - Failed temporary verification copies and historical runtime logs are retained for inspection; they are not release artifacts. No unrelated workspace cleanup was performed.
