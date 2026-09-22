@@ -16,7 +16,7 @@ instructions, or template verification as current project instructions.
 - If `.scaffold/project.json` is absent, this is an uninitialized template checkout. Run `node scripts/init.mjs` with an explicit name, scope, API port and WebUI port before installing dependencies.
 - If `.scaffold/project.json` exists, this is an initialized application. Do not initialize it again; read its generated `AGENTS.md`, install with the locked package manager, then run `pnpm verify`.
 - Initialization happens in the cloned checkout; it does not create a second sibling project directory.
-- The initializer creates `.env`, records immutable scaffold lineage, archives this maintainer rule file under `.scaffold`, writes application rules at the root, resets project verification to pending, and removes maintainer-only PRDs, implementation evidence and recipes.
+- The initializer creates `.env`, records immutable scaffold lineage, archives this maintainer rule file under `.scaffold`, writes application-only rules at the root, resets project verification to pending, removes maintainer-only PRDs and implementation evidence, and relocates reusable guides and recipes to `docs/scaffold`.
 - Pulling later scaffold commits into an initialized application is not an automatic upgrade mechanism. Compare and merge code intentionally without overwriting application rules, business code, `.env`, or `APP_DATA_DIR`.
 
 ## Repository map
@@ -26,7 +26,7 @@ instructions, or template verification as current project instructions.
 - `packages/webui`: Hono HTTP implementation.
 - `packages/frontend`: React/Vite WebUI and the centralized API client.
 - `packages/db`: injected repository boundary and memory adapter.
-- `.scaffold/recipes`: maintainer-only independent capability examples, excluded on initialization.
+- `.scaffold/recipes`: maintainer source for independent capability examples, relocated to `docs/scaffold/recipes` on initialization.
 - `scripts`: initialization, lifecycle, build identity, diagnostics, and repository gates.
 - `.scaffold`: scaffold metadata and maintainer guidance.
 

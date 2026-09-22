@@ -77,6 +77,9 @@ test('initialization commits a complete identity and refuses an accidental secon
       encoding: 'utf8',
     });
     assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stderr, /docs\/scaffold\/README\.md/);
+    assert.match(result.stderr, /Ant Design/);
+    assert.match(result.stderr, /not active AGENTS\.md rules/);
     const manifest = JSON.parse(
       readFileSync(path.join(target, 'package.json'), 'utf8'),
     );
@@ -98,9 +101,9 @@ test('initialization commits a complete identity and refuses an accidental secon
     );
     const agentRules = readFileSync(path.join(target, 'AGENTS.md'), 'utf8');
     assert.match(agentRules, /^# Application agent rules/);
-    assert.match(agentRules, /initialized fixture-app application/);
+    assert.match(agentRules, /This is the fixture-app application/);
     assert.match(agentRules, /Package scope: `@fixture-app`/);
-    assert.doesNotMatch(agentRules, /scaffold maintainer checkout only/);
+    assert.doesNotMatch(agentRules, /scaffold/i);
     const archivedRules = readFileSync(
       path.join(target, '.scaffold', 'SCAFFOLD_MAINTAINER.md'),
       'utf8',
@@ -116,6 +119,24 @@ test('initialization commits a complete identity and refuses an accidental secon
       'PRD-managed-service-contract.md',
     ])
       assert.equal(existsSync(path.join(target, 'docs', file)), false);
+    assert.equal(
+      existsSync(path.join(target, '.scaffold', 'recipes', 'README.md')),
+      false,
+    );
+    for (const file of [
+      'docs/scaffold/README.md',
+      'docs/scaffold/frontend.md',
+      'docs/scaffold/recipes/README.md',
+      'docs/scaffold/recipes/ui/ItemsPage.tsx',
+    ])
+      assert.equal(existsSync(path.join(target, file)), true, file);
+    assert.match(
+      readFileSync(
+        path.join(target, 'docs/scaffold/recipes/ui/ItemsPage.tsx'),
+        'utf8',
+      ),
+      /@fixture-app\/api/,
+    );
     assert.doesNotMatch(
       readFileSync(path.join(target, '.github/workflows/ci.yml'), 'utf8'),
       /112712/,

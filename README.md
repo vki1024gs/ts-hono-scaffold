@@ -29,7 +29,7 @@ pnpm app:start
 
 把 `my-project`、`@my-project` 换成你的项目名和包作用域。初始化会生成 `.env` 并同步包名与端口。复制生成的项目仍保留原 Git 远端；开始向自己的仓库提交前，使用 `git remote set-url origin <你的仓库地址>` 修改远端。
 
-冷启动不会在旁边再生成一套项目：克隆目录本身会被原子转换为你的应用。初始化完成后，原脚手架 `AGENTS.md` 会移到 `.scaffold/SCAFFOLD_MAINTAINER.md` 作为非活动溯源资料，根目录生成该应用自己的 `AGENTS.md`；脚手架维护者 PRD、实现验收记录和可选 recipes 会被移除，项目验证状态重新从 pending 开始。以后拉取脚手架提交不等于自动升级，必须比较后有选择地合并。
+冷启动不会在旁边再生成一套项目：克隆目录本身会被原子转换为你的应用。初始化完成后，原脚手架 `AGENTS.md` 会移到 `.scaffold/SCAFFOLD_MAINTAINER.md` 作为非活动溯源资料，根目录生成只描述当前应用的 `AGENTS.md`；脚手架维护者 PRD 和实现验收记录会被移除，可复用指南与 recipes 会转移到 `docs/scaffold/`。初始化完成信息会明确提示该位置，但不会把这些参考资料注入应用规则。项目验证状态重新从 pending 开始。以后拉取脚手架提交不等于自动升级，必须比较后有选择地合并。
 
 如果只想运行脚手架本身，在克隆后跳过 `node scripts/init.mjs ...`，直接安装、验证、启动即可。维护脚手架的原始工作目录不要执行项目初始化。
 
@@ -66,7 +66,7 @@ pnpm dev
 - **页面标题**：修改 `.env` 中的 `VITE_APP_TITLE` 后重新构建或重启开发模式。
 - **定位请求错误**：用响应的 `X-Request-Id` 查询 `node scripts/app.mjs logs --request-id REQUEST_ID`；日志文件位于应用数据目录的 `logs/`。
 - **清理日志**：先执行 `node scripts/app.mjs logs-clean --dry-run` 预览，再按需使用 `--apply`。不会删除正在写入的日志。
-- **需要数据库、登录或复杂 UI**：默认没有持久化或正式认证；按自己的业务接入。独立 UI、Query、stream 示例见 `.scaffold/recipes`，初始化时会移除这些维护者示例，接入前从对应脚手架版本获取。
+- **需要数据库、登录或复杂 UI**：默认没有持久化或正式认证；按自己的业务接入。模板维护目录中的独立 UI、Query、stream 示例位于 `.scaffold/recipes`；初始化后，对应版本的参考快照位于 `docs/scaffold/`。
 
 0.3.1 在既有契约、CRUD、健康、日志和配置迁移基础上，补齐跨平台换行与格式门禁、真正的生产构建产物，以及不依赖 `node_modules` 或开发依赖的运行验证。详细运维说明见 [OPERATIONS.md](docs/OPERATIONS.md)。
 
@@ -83,9 +83,9 @@ pnpm app:start
 
 Initialization has `--dry-run`, input validation and rollback. Repeating it requires `--reconfigure`; reconfiguration changes supported settings without changing project identity or its original scaffoldVersion. Existing `.env` values are preserved except explicitly reconfigured ports. Never initialize this maintainer checkout as a user application. Generated project validation starts as **pending**, not inherited from template results.
 
-Cold start transforms the clone in place; it does not create a second project. The first successful initialization moves the maintainer rules to inactive `.scaffold/SCAFFOLD_MAINTAINER.md`, writes application-specific rules at root `AGENTS.md`, and removes maintainer-only planning and verification artifacts. Later scaffold pulls are source merges, not a supported automatic upgrade path.
+Cold start transforms the clone in place; it does not create a second project. The first successful initialization moves the maintainer rules to inactive `.scaffold/SCAFFOLD_MAINTAINER.md`, writes application-only rules at root `AGENTS.md`, removes maintainer-only planning and verification artifacts, and moves reusable guides and recipes to `docs/scaffold/`. The completion output points the initializing agent to that reference without making it an active rule source. Later scaffold pulls are source merges, not a supported automatic upgrade path.
 
-There is one base application, no application-type selector. Ant Design, Query, chat, real authentication, SQLite and a diagnostic CLI are not default dependencies or routes. Maintainer integration recipes live in `.scaffold/recipes` and are excluded on initialization; obtain a recipe from the scaffold version you adopted and follow its individual guide. P2 persistence/login/deployment features remain demand-driven.
+There is one base application, no application-type selector. Ant Design, Query, chat, real authentication, SQLite and a diagnostic CLI are not default dependencies or routes. Maintainer integration recipes live in `.scaffold/recipes`; initialization preserves the version-matched snapshot under `docs/scaffold/` for deliberate adoption. P2 persistence/login/deployment features remain demand-driven.
 
 ## Run and diagnose
 

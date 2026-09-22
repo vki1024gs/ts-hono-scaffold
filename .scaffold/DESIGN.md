@@ -1,6 +1,6 @@
 # Scaffold design
 
-The base is a contract-first local Hono/React application with a memory CRUD example. No UI library, caching layer, chat, login, SQLite or diagnostic CLI is preinstalled. Maintainer-owned recipes are independent source examples and are removed by initialization.
+The base is a contract-first local Hono/React application with a memory CRUD example. No UI library, caching layer, chat, login, SQLite or diagnostic CLI is preinstalled. Maintainer-owned recipes are independent source examples; initialization relocates a version-matched reference snapshot to `docs/scaffold/recipes` without enabling it or adding it to application rules.
 
 The API package owns schemas and route definitions. The server uses a small response boundary that checks the exact declared schema; compile-time inference and real ts-rest-to-Hono tests enforce the pairing. No generic router/DI framework is introduced. Core is framework-free; repository instances are injected per application; the optional actor resolver is a narrow boundary, not a bundled authentication product.
 

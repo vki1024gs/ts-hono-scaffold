@@ -1,6 +1,6 @@
 # Independent integration recipes (0.3.1)
 
-These maintainer-owned files are excluded from initialized projects. Save the desired recipe outside a generated project before initialization, or obtain it from the scaffold version you adopted. There is one base application, no presets and no capability installer. Each recipe owns only its listed files. Use your generated package scope instead of `@proj`. Package installation requires network access; verify and commit the resulting lockfile.
+These maintainer-owned source examples are relocated to `docs/scaffold/recipes` during first initialization, preserving a reference snapshot that matches the adopted scaffold version. They are not enabled automatically and are not application rules. There is one base application, no presets and no capability installer. Each recipe owns only its listed files. Initialization replaces the template package scope; package installation requires network access, and an adopted recipe must be verified with its resulting lockfile committed.
 
 ## Ant Design alone
 

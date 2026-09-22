@@ -42,7 +42,15 @@ try {
         entry.isFile() || containsFiles(path.join(directory, entry.name)),
     );
   if (containsFiles(path.join(project, '.scaffold/recipes')))
-    throw new Error('Optional recipe source leaked into generated project');
+    throw new Error('Optional recipe source was not relocated');
+  for (const relative of [
+    'docs/scaffold/README.md',
+    'docs/scaffold/frontend.md',
+    'docs/scaffold/recipes/README.md',
+    'docs/scaffold/recipes/ui/ItemsPage.tsx',
+  ])
+    if (!existsSync(path.join(project, relative)))
+      throw new Error(`Generated reference missing: ${relative}`);
   if (
     !readFileSync(path.join(project, 'PROJECT_STATUS.md'), 'utf8').includes(
       'pending',

@@ -23,7 +23,7 @@ const allowedRootFiles = [
   'pnpm-workspace.yaml',
   'service.manifest.json',
 ];
-const allowedDirectories = ['.scaffold', 'packages', 'scripts'];
+const allowedDirectories = ['.scaffold', 'docs', 'packages', 'scripts'];
 const allowedExtensions = new Set([
   '.css',
   '.html',
@@ -79,13 +79,11 @@ const generatedAgentRules = ({
 
 ## Mission
 
-This is the initialized ${name} application, derived from the TypeScript/Hono scaffold. Treat this repository as an application, not as a scaffold maintainer checkout. Project identity and original scaffold lineage are recorded in \`.scaffold/project.json\`.
+This is the ${name} application. Treat the repository as a product codebase and keep its implementation, documentation and verification evidence current.
 
 ## Cold start
 
 - Requires Node.js 24+ and pnpm 10.20.0.
-- Do not run first-time initialization again. Use \`node scripts/init.mjs --reconfigure\` only to change supported ports or description without renaming the project.
-- \`.scaffold/SCAFFOLD_MAINTAINER.md\` is inactive historical reference from the template and is not an instruction file for this application.
 - Install with \`corepack pnpm install --frozen-lockfile\`, then run \`pnpm verify\` before relying on the checkout.
 - Use \`pnpm dev\` for foreground development, \`pnpm app:start\` for the owned local background instance, and \`pnpm app:run\` when an external process manager owns the foreground process.
 - Diagnose with \`pnpm doctor\`, \`pnpm app:status\`, \`pnpm smoke\`, and \`pnpm app:logs\`.
@@ -110,7 +108,7 @@ This is the initialized ${name} application, derived from the TypeScript/Hono sc
 
 ## Required checks
 
-Run \`pnpm verify\` before handoff. For lifecycle or deployment changes, also run \`pnpm verify:production\` and \`pnpm verify:generated\`. Record only verification actually performed for this application; scaffold maintainer results are not application evidence.
+Run \`pnpm verify\` before handoff. For lifecycle or deployment changes, also run \`pnpm verify:production\`. Record only verification actually performed for this application.
 `;
 
 async function collectFiles(directory) {
@@ -375,10 +373,18 @@ async function main() {
           rootPackage.version +
           '\n\nAll verification states: pending. Run frozen install, pnpm verify, managed start and smoke locally. Template maintainer results are not project evidence.\n',
       );
-      for (const file of await collectFiles(
-        path.join(root, '.scaffold/recipes'),
-      ))
+      const recipesRoot = path.join(root, '.scaffold', 'recipes');
+      for (const file of await collectFiles(recipesRoot)) {
+        const destination = path.join(
+          root,
+          'docs',
+          'scaffold',
+          'recipes',
+          path.relative(recipesRoot, file),
+        );
+        changes.set(destination, changes.get(file));
         changes.set(file, null);
+      }
       for (const relative of [
         'docs/PRD-scaffold-evolution.md',
         'docs/PRD-managed-service-contract.md',
@@ -399,6 +405,10 @@ async function main() {
       return;
     }
     await atomicWrite(changes);
+    if (!current)
+      console.warn(
+        'Optional implementation guides, including Ant Design selection guidance, were retained at docs/scaffold/README.md. They are reference material, not active AGENTS.md rules.',
+      );
     console.log(
       'Initialization completed. Run corepack pnpm install --frozen-lockfile, then pnpm verify.',
     );
