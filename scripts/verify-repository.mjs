@@ -52,6 +52,22 @@ const retiredDocuments = [
   'docs/PRD-scaffold-evolution.md',
   'docs/PRD-managed-service-contract.md',
 ];
+const scaffoldGuideSources = [
+  '.scaffold/README.md',
+  '.scaffold/CUSTOMIZATION.md',
+  '.scaffold/DESIGN.md',
+  '.scaffold/DEPLOYMENT.md',
+  '.scaffold/FRONTEND.md',
+  '.scaffold/recipes/README.md',
+];
+const generatedGuideTargets = [
+  'docs/scaffold/README.md',
+  'docs/scaffold/CUSTOMIZATION.md',
+  'docs/scaffold/DESIGN.md',
+  'docs/scaffold/DEPLOYMENT.md',
+  'docs/scaffold/FRONTEND.md',
+  'docs/scaffold/recipes/README.md',
+];
 const forbidden = [
   /(^|\/)node_modules\//,
   /(^|\/)dist\//,
@@ -85,6 +101,19 @@ const serviceManifest = JSON.parse(
   readFileSync(path.join(root, 'service.manifest.json'), 'utf8'),
 );
 const manifestErrors = validateServiceManifest(serviceManifest, packageJson);
+const initialized = existsSync(path.join(root, '.scaffold/project.json'));
+const requiredGuides = initialized
+  ? generatedGuideTargets
+  : scaffoldGuideSources;
+const forbiddenGuideCopies = initialized
+  ? scaffoldGuideSources
+  : generatedGuideTargets;
+for (const file of requiredGuides)
+  if (!existsSync(path.join(root, file)))
+    manifestErrors.push(`guide layout: missing ${file}`);
+for (const file of forbiddenGuideCopies)
+  if (existsSync(path.join(root, file)))
+    manifestErrors.push(`guide layout: duplicate or misplaced ${file}`);
 for (const script of [
   'format',
   'format:check',

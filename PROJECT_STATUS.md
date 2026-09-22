@@ -6,21 +6,21 @@ Updated: 2026-09-22. Scaffold version: **0.3.1** (root package.json is authorita
 
 Version 0.3.1 is committed and pushed to `vki1024gs/ts-hono-scaffold` on `main`. Completed PRDs have been retired; this file records verified repository and CI evidence without implying a tag, hosted release or deployment.
 
-| Requirement        | Implemented behavior / evidence                                                                                                                                             |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Contract           | Shared ts-rest/Zod routes, request and response validation, compile-time response regression and actual client-to-Hono CRUD test.                                           |
-| Requests/errors    | Central client cancellation/timeouts, safe correlated errors, request-only 400 classification, internal failures 500, API and page 404.                                     |
-| Examples           | Injected isolated memory repository; stream recipe handles framing, cancellation and one user-message write per send.                                                       |
-| Configuration      | Validated hosts, ports, log level and `APP_DATA_DIR`; environment overrides `.env`; local defaults stay on loopback.                                                        |
-| Durable settings   | Versioned application/document identity, sequential migrations, import preview, exact-byte backup, atomic replacement, validation and rollback.                             |
-| Verification       | Real ESLint boundaries, types, script and interaction tests, generated frozen installation, managed and foreground runtime checks.                                          |
-| Build/runtime      | Private source workspaces, bundled Node API, static WebUI server/proxy, formatting gate and a dependency-free production projection.                                        |
-| Business loop      | Native React list/create/edit/delete with loading, empty, error and retry states; independent UI and Query recipes.                                                         |
-| Layout             | Lazy route configuration, error boundary, keyboard interaction, skip link, responsive layout and expansion guidance.                                                        |
-| Generation         | Transactional initializer/reconfiguration, application-only generated `AGENTS.md`, maintainer artifact removal, retained reference snapshot and explicit completion notice. |
-| Health             | Live/ready/status, required versus optional dependency failures, bounded/coalesced checks, build/instance identity and whole-app diagnostics.                               |
-| Service management | Strict service manifest, foreground owner, managed lifecycle JSON, effective endpoints and a shared cross-process operation lock.                                           |
-| Logs               | Shared safe NDJSON events, bounded queue/files/retention, rotation/retry, failure visibility, bounded queries and dry-run archive cleanup.                                  |
+| Requirement        | Implemented behavior / evidence                                                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Contract           | Shared ts-rest/Zod routes, request and response validation, compile-time response regression and actual client-to-Hono CRUD test.                                              |
+| Requests/errors    | Central client cancellation/timeouts, safe correlated errors, request-only 400 classification, internal failures 500, API and page 404.                                        |
+| Examples           | Injected isolated memory repository; stream recipe handles framing, cancellation and one user-message write per send.                                                          |
+| Configuration      | Validated hosts, ports, log level and `APP_DATA_DIR`; environment overrides `.env`; local defaults stay on loopback.                                                           |
+| Durable settings   | Versioned application/document identity, sequential migrations, import preview, exact-byte backup, atomic replacement, validation and rollback.                                |
+| Verification       | Real ESLint boundaries, types, script and interaction tests, generated frozen installation, managed and foreground runtime checks.                                             |
+| Build/runtime      | Private source workspaces, bundled Node API, static WebUI server/proxy, formatting gate and a dependency-free production projection.                                           |
+| Business loop      | Native React list/create/edit/delete with loading, empty, error and retry states; independent UI and Query recipes.                                                            |
+| Layout             | Lazy route configuration, error boundary, keyboard interaction, skip link, responsive layout and expansion guidance.                                                           |
+| Generation         | Transactional initializer/reconfiguration, application-only generated `AGENTS.md`, single-source guide relocation, maintainer artifact removal and explicit completion notice. |
+| Health             | Live/ready/status, required versus optional dependency failures, bounded/coalesced checks, build/instance identity and whole-app diagnostics.                                  |
+| Service management | Strict service manifest, foreground owner, managed lifecycle JSON, effective endpoints and a shared cross-process operation lock.                                              |
+| Logs               | Shared safe NDJSON events, bounded queue/files/retention, rotation/retry, failure visibility, bounded queries and dry-run archive cleanup.                                     |
 
 ## Verification record
 

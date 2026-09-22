@@ -373,16 +373,30 @@ async function main() {
           rootPackage.version +
           '\n\nAll verification states: pending. Run frozen install, pnpm verify, managed start and smoke locally. Template maintainer results are not project evidence.\n',
       );
-      const recipesRoot = path.join(root, '.scaffold', 'recipes');
-      for (const file of await collectFiles(recipesRoot)) {
+      const scaffoldRoot = path.join(root, '.scaffold');
+      const reusableGuides = [
+        ...[
+          'README.md',
+          'CUSTOMIZATION.md',
+          'DESIGN.md',
+          'DEPLOYMENT.md',
+          'FRONTEND.md',
+        ].map((relative) => path.join(scaffoldRoot, relative)),
+        ...(await collectFiles(path.join(scaffoldRoot, 'recipes'))),
+      ];
+      for (const file of reusableGuides) {
+        const content = changes.get(file);
+        if (typeof content !== 'string')
+          throw new Error(
+            `Missing scaffold guide source: ${path.relative(root, file)}`,
+          );
         const destination = path.join(
           root,
           'docs',
           'scaffold',
-          'recipes',
-          path.relative(recipesRoot, file),
+          path.relative(scaffoldRoot, file),
         );
-        changes.set(destination, changes.get(file));
+        changes.set(destination, content);
         changes.set(file, null);
       }
       for (const relative of [

@@ -22,11 +22,32 @@ const copyTemplate = () => {
   cpSync(root, target, {
     recursive: true,
     filter: (source) =>
-      !['.git', 'node_modules', '.runtime', '.env'].includes(
+      !['.git', 'node_modules', '.runtime', '.env', 'dist'].includes(
         path.basename(source),
       ),
   });
-  rmSync(path.join(target, '.scaffold', 'project.json'), { force: true });
+  const projectMarker = path.join(target, '.scaffold', 'project.json');
+  const generatedGuides = path.join(target, 'docs', 'scaffold');
+  if (existsSync(projectMarker) && existsSync(generatedGuides)) {
+    for (const file of [
+      'README.md',
+      'CUSTOMIZATION.md',
+      'DESIGN.md',
+      'DEPLOYMENT.md',
+      'FRONTEND.md',
+    ])
+      cpSync(
+        path.join(generatedGuides, file),
+        path.join(target, '.scaffold', file),
+      );
+    cpSync(
+      path.join(generatedGuides, 'recipes'),
+      path.join(target, '.scaffold', 'recipes'),
+      { recursive: true },
+    );
+    rmSync(generatedGuides, { recursive: true, force: true });
+  }
+  rmSync(projectMarker, { force: true });
   return target;
 };
 const args = [
@@ -119,13 +140,21 @@ test('initialization commits a complete identity and refuses an accidental secon
       'PRD-managed-service-contract.md',
     ])
       assert.equal(existsSync(path.join(target, 'docs', file)), false);
-    assert.equal(
-      existsSync(path.join(target, '.scaffold', 'recipes', 'README.md')),
-      false,
-    );
+    for (const file of [
+      '.scaffold/README.md',
+      '.scaffold/CUSTOMIZATION.md',
+      '.scaffold/DESIGN.md',
+      '.scaffold/DEPLOYMENT.md',
+      '.scaffold/FRONTEND.md',
+      '.scaffold/recipes/README.md',
+    ])
+      assert.equal(existsSync(path.join(target, file)), false, file);
     for (const file of [
       'docs/scaffold/README.md',
-      'docs/scaffold/frontend.md',
+      'docs/scaffold/CUSTOMIZATION.md',
+      'docs/scaffold/DESIGN.md',
+      'docs/scaffold/DEPLOYMENT.md',
+      'docs/scaffold/FRONTEND.md',
       'docs/scaffold/recipes/README.md',
       'docs/scaffold/recipes/ui/ItemsPage.tsx',
     ])

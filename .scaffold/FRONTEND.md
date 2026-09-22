@@ -14,7 +14,7 @@ Native controls and project CSS remain appropriate for a small focused screen, c
 
 ## Adoption checklist
 
-1. Read `docs/scaffold/recipes/README.md` and use the Ant Design example matching the recorded scaffold version.
+1. Read `recipes/README.md` beside this guide and use the Ant Design example matching the recorded scaffold version.
 2. Add Ant Design to the frontend package's runtime `dependencies`, never the root package or `devDependencies`.
 3. Define theme tokens centrally and preserve keyboard behavior, visible focus, responsive layouts, loading, empty, error and retry states.
 4. Test the actual workflows at narrow and normal widths. Run `pnpm verify` and inspect the production bundle before handoff.

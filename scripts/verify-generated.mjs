@@ -41,11 +41,26 @@ try {
       (entry) =>
         entry.isFile() || containsFiles(path.join(directory, entry.name)),
     );
-  if (containsFiles(path.join(project, '.scaffold/recipes')))
-    throw new Error('Optional recipe source was not relocated');
+  for (const relative of [
+    '.scaffold/README.md',
+    '.scaffold/CUSTOMIZATION.md',
+    '.scaffold/DESIGN.md',
+    '.scaffold/DEPLOYMENT.md',
+    '.scaffold/FRONTEND.md',
+    '.scaffold/recipes',
+  ])
+    if (
+      existsSync(path.join(project, relative)) &&
+      (relative !== '.scaffold/recipes' ||
+        containsFiles(path.join(project, relative)))
+    )
+      throw new Error(`Scaffold guide source was not relocated: ${relative}`);
   for (const relative of [
     'docs/scaffold/README.md',
-    'docs/scaffold/frontend.md',
+    'docs/scaffold/CUSTOMIZATION.md',
+    'docs/scaffold/DESIGN.md',
+    'docs/scaffold/DEPLOYMENT.md',
+    'docs/scaffold/FRONTEND.md',
     'docs/scaffold/recipes/README.md',
     'docs/scaffold/recipes/ui/ItemsPage.tsx',
   ])
